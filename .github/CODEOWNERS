@@ -1,0 +1,7 @@
+# Default reviewers for everything
+*       @your-github-username
+
+# Core structural chokepoints
+/apps/api/src/enum_api/policy/     @your-github-username
+/apps/api/src/enum_api/audit/      @your-github-username
+/apps/api/src/enum_api/llm/        @your-github-username
