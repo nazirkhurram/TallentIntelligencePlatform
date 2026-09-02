@@ -10,8 +10,8 @@ from enum_schema.base import HealthResponse
 
 
 @asynccontextmanager
-
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+
     """Application lifespan manager for startup and shutdown events."""
     # Startup initialization
     yield

@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class ExtractionSource(StrEnum):
     """Extraction provenance source ladder."""
+
     REGEX = "regex"
     GAZETTEER = "gazetteer"
     NER = "ner"
@@ -22,6 +23,7 @@ class ExtractionSource(StrEnum):
 
 class EmploymentState(StrEnum):
     """Person employment status."""
+
     CANDIDATE = "candidate"
     INTERNAL_BENCH = "internal_bench"
     DEPLOYED = "deployed"
@@ -30,6 +32,7 @@ class EmploymentState(StrEnum):
 
 class ProvenanceField(BaseModel):
     """Field-level provenance model matching profile_field data contract."""
+
     model_config = ConfigDict(from_attributes=True)
 
     person_id: UUID
@@ -44,9 +47,8 @@ class ProvenanceField(BaseModel):
 
 class HealthResponse(BaseModel):
     """Health check response schema."""
+
     status: str = "ok"
     version: str = "0.1.0"
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     services: dict[str, str] = Field(default_factory=dict)
-
-
