@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "models": [
+    {
+      "name": "qwen2.5-3b-instruct-q4_k_m.gguf",
+      "task": "generation",
+      "alias": "enum-extract",
+      "description": "Generative extraction, summaries, and copilot reasoning on CPU (Q4_K_M quant)",
+      "url": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf",
+      "sha256": "3cb49a4632876bf661dbb08a5436688dd6da722c1db4eb624535b44081c3eecf",
+      "size_bytes": 2049534944,
+      "format": "gguf",
+      "runtime": "llama.cpp"
+    },
+    {
+      "name": "multilingual-e5-small-int8.onnx",
+      "task": "embeddings",
+      "alias": "enum-embed",
+      "description": "Multilingual dense embeddings (384-dim) covering EN, AR, and UR",
+      "url": "https://huggingface.co/intfloat/multilingual-e5-small/resolve/main/model_quantized.onnx",
+      "sha256": "a7945d9db8935c1569420040f2fef09dbab55fbf6394336c507c3cb4ad832267",
+      "size_bytes": 118489088,
+      "format": "onnx",
+      "runtime": "onnxruntime"
+    },
+    {
+      "name": "bge-reranker-base-int8.onnx",
+      "task": "reranking",
+      "alias": "enum-rerank",
+      "description": "Cross-encoder reranking over top 50 retrieved candidates",
+      "url": "https://huggingface.co/BAAI/bge-reranker-base/resolve/main/model_quantized.onnx",
+      "sha256": "f5c531d2798e98322b7a974ea487a2dafe6c4664d603a113589b4f2c06927a42",
+      "size_bytes": 278921216,
+      "format": "onnx",
+      "runtime": "onnxruntime"
+    },
+    {
+      "name": "xlm-roberta-base-ner-int8.onnx",
+      "task": "ner",
+      "alias": "enum-ner",
+      "description": "Multilingual Named Entity Recognition for ORG, ROLE, DEGREE, INSTITUTION",
+      "url": "https://huggingface.co/Davlan/xlm-roberta-base-ner-hrl/resolve/main/model_quantized.onnx",
+      "sha256": "12903517c2f0f42b82bb57a79f170b0cc8a7b97e937d7a1262d147bbabf5c12e",
+      "size_bytes": 278142976,
+      "format": "onnx",
+      "runtime": "onnxruntime"
+    }
+  ]
+}

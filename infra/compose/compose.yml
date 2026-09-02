@@ -9,6 +9,7 @@ volumes:
   pgdata:
   redisdata:
   miniodata:
+  modelweights:
 
 services:
   postgres:
@@ -103,6 +104,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin_secret}
       MINIO_SECURE: "false"
+      MODEL_WEIGHTS_DIR: /models
     networks:
       - enum-network
 
@@ -127,6 +129,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin_secret}
       MINIO_SECURE: "false"
+      MODEL_WEIGHTS_DIR: /models
     networks:
       - enum-network
 
