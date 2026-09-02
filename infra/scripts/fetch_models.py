@@ -43,14 +43,13 @@ def load_manifest(manifest_path: Path) -> list[dict[str, Any]]:
     """Load and validate the model weights manifest."""
     if not manifest_path.exists():
         raise FileNotFoundError(f"Manifest not found at {manifest_path}")
-    with open(manifest_path, "r", encoding="utf-8") as f:
+    with open(manifest_path, encoding="utf-8") as f:
         data = json.load(f)
     return cast(list[dict[str, Any]], data.get("models", []))
 
 
-
 def download_file(url: str, dest_path: Path, expected_hash: str) -> bool:
-    """Download a file atomically to a temporary location, verify checksum, and move to destination."""
+    """Download a file atomically to a temporary location, verify hash, and move to dest."""
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     temp_fd, temp_path_str = tempfile.mkstemp(
         dir=dest_path.parent, prefix=f".{dest_path.name}.", suffix=".tmp"
@@ -73,8 +72,10 @@ def download_file(url: str, dest_path: Path, expected_hash: str) -> bool:
                 downloaded += len(chunk)
                 if total_size > 0:
                     pct = (downloaded / total_size) * 100
+                    mb_down = downloaded / (1024 * 1024)
+                    mb_total = total_size / (1024 * 1024)
                     print(
-                        f"\r  Progress: {pct:.1f}% ({downloaded / (1024*1024):.1f}/{total_size / (1024*1024):.1f} MB)",
+                        f"\r  Progress: {pct:.1f}% ({mb_down:.1f}/{mb_total:.1f} MB)",
                         end="",
                         flush=True,
                     )
@@ -128,7 +129,10 @@ def verify_model(model_dir: Path, model_info: dict[str, Any]) -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Fetch and verify model weights for ENUM platform.")
+    parser = argparse.ArgumentParser(
+        description="Fetch and verify model weights for ENUM platform."
+    )
+
     parser.add_argument(
         "--manifest",
         type=Path,

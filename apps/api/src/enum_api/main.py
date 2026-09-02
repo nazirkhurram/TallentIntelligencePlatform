@@ -3,11 +3,11 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from enum_schema.base import HealthResponse
+
 
 
 @asynccontextmanager
