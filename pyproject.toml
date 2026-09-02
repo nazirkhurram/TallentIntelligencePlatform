@@ -44,6 +44,10 @@ line-length = 100
 select = ["E", "F", "I", "UP", "B", "SIM"]
 ignore = []
 
+[tool.ruff.lint.isort]
+known-first-party = ["enum_api", "enum_worker", "enum_schema"]
+
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
