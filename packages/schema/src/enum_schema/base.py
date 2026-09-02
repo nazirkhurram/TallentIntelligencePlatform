@@ -1,6 +1,6 @@
 """Base schemas and shared models adhering to the platform data specification."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import UUID
@@ -46,6 +46,7 @@ class HealthResponse(BaseModel):
     """Health check response schema."""
     status: str = "ok"
     version: str = "0.1.0"
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     services: dict[str, str] = Field(default_factory=dict)
+
 

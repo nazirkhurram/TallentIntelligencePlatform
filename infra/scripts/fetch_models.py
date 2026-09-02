@@ -18,7 +18,7 @@ import sys
 import tempfile
 import urllib.request
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,7 +45,8 @@ def load_manifest(manifest_path: Path) -> list[dict[str, Any]]:
         raise FileNotFoundError(f"Manifest not found at {manifest_path}")
     with open(manifest_path, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data.get("models", [])
+    return cast(list[dict[str, Any]], data.get("models", []))
+
 
 
 def download_file(url: str, dest_path: Path, expected_hash: str) -> bool:
