@@ -1,0 +1,144 @@
+# infra/compose/compose.yml
+name: enum-talent-platform
+
+networks:
+  enum-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: enum-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-enum_tip}
+      POSTGRES_USER: ${POSTGRES_USER:-enum_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-enum_secure_password_dev}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-enum_admin} -d ${POSTGRES_DB:-enum_tip}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - enum-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: enum-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - enum-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: enum-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin_secret}
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - enum-network
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: enum-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin_secret};
+      mc mb --ignore-existing myminio/raw-documents;
+      mc mb --ignore-existing myminio/derived-artefacts;
+      mc mb --ignore-existing myminio/exports;
+      exit 0;
+      "
+    networks:
+      - enum-network
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    container_name: enum-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-enum_admin}:${POSTGRES_PASSWORD:-enum_secure_password_dev}@postgres:5432/${POSTGRES_DB:-enum_tip}
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin_secret}
+      MINIO_SECURE: "false"
+    networks:
+      - enum-network
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/worker/Dockerfile
+    container_name: enum-worker
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-enum_admin}:${POSTGRES_PASSWORD:-enum_secure_password_dev}@postgres:5432/${POSTGRES_DB:-enum_tip}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin_secret}
+      MINIO_SECURE: "false"
+    networks:
+      - enum-network
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    container_name: enum-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    networks:
+      - enum-network

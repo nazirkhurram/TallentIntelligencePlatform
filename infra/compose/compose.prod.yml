@@ -1,0 +1,66 @@
+# infra/compose/compose.prod.yml
+services:
+  postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4096M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+
+  minio:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2048M
+
+  api:
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
+    command: ["uvicorn", "enum_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  worker:
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8192M
+    command: ["celery", "-A", "enum_worker.celery_app", "worker", "--loglevel=warning", "--concurrency=4"]
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  web:
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
+    command: ["npm", "start"]

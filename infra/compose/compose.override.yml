@@ -1,0 +1,42 @@
+# infra/compose/compose.override.yml
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  api:
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../apps/api:/app/apps/api
+      - ../../packages/schema:/app/packages/schema
+      - ../../pyproject.toml:/app/pyproject.toml
+      - ../../uv.lock:/app/uv.lock
+    command: ["uvicorn", "enum_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  worker:
+    volumes:
+      - ../../apps/worker:/app/apps/worker
+      - ../../packages/schema:/app/packages/schema
+      - ../../pyproject.toml:/app/pyproject.toml
+      - ../../uv.lock:/app/uv.lock
+    command: ["celery", "-A", "enum_worker.celery_app", "worker", "--loglevel=info"]
+
+  web:
+    user: "root"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+

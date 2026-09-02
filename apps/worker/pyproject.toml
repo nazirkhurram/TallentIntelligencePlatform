@@ -1,0 +1,25 @@
+[project]
+name = "enum-worker"
+version = "0.1.0"
+description = "Celery asynchronous processing workers for ENUM Talent Platform"
+requires-python = ">=3.12"
+dependencies = [
+    "celery[redis]>=5.4.0",
+    "redis>=5.0.8",
+    "sqlalchemy[asyncio]>=2.0.32",
+    "asyncpg>=0.29.0",
+    "minio>=7.2.8",
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
+    "enum-schema",
+]
+
+[tool.uv.sources]
+enum-schema = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/enum_worker"]
