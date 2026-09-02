@@ -15,7 +15,7 @@ jobs:
     name: Ruff (Lint & Format)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
@@ -30,7 +30,7 @@ jobs:
     name: Mypy (Type Check)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
@@ -43,7 +43,7 @@ jobs:
     name: uv Lock Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v3
       - name: Verify Lockfile
         run: uv lock --check
@@ -52,7 +52,7 @@ jobs:
     name: Pytest Suite
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
@@ -75,7 +75,7 @@ jobs:
           - service: web
             file: apps/web/Dockerfile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.service }}
         uses: docker/build-push-action@v5
