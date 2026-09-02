@@ -1,0 +1,36 @@
+name: Deploy to On-Prem VM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: on-prem-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Stack (On-Prem)
+    runs-on: [self-hosted, on-prem]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy Production Compose Stack
+        run: |
+          docker compose -f infra/compose/compose.yml -f infra/compose/compose.prod.yml up -d --build --remove-orphans
+
+      - name: Verify Service Health
+        run: |
+          echo "Waiting for API readiness..."
+          for i in {1..30}; do
+            if curl -s -f http://localhost:8000/health; then
+              echo "==> API is healthy and responding!"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "ERROR: Healthcheck timed out after 60s"
+          docker compose -f infra/compose/compose.yml -f infra/compose/compose.prod.yml logs api
+          exit 1

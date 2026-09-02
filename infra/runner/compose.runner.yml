@@ -1,0 +1,20 @@
+# infra/runner/compose.runner.yml
+name: enum-actions-runner
+
+services:
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enum-actions-runner
+    restart: unless-stopped
+    environment:
+      GITHUB_REPO_URL: ${GITHUB_REPO_URL:-https://github.com/nazirkhurram/TallentIntelligencePlatform}
+      RUNNER_TOKEN: ${RUNNER_TOKEN}
+      RUNNER_LABELS: self-hosted,on-prem,linux,x64
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-work:/home/runner/_work
+
+volumes:
+  runner-work:
