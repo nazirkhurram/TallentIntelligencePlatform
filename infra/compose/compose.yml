@@ -16,7 +16,14 @@ services:
     image: pgvector/pgvector:pg16
     container_name: enum-postgres
     restart: unless-stopped
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c work_mem=16MB
+      -c maintenance_work_mem=64MB
+      -c effective_cache_size=1GB
     environment:
+
       POSTGRES_DB: ${POSTGRES_DB:-enum_tip}
       POSTGRES_USER: ${POSTGRES_USER:-enum_admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-enum_secure_password_dev}

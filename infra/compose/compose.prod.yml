@@ -1,6 +1,12 @@
 # infra/compose/compose.prod.yml
 services:
   postgres:
+    command: >
+      postgres
+      -c shared_buffers=1024MB
+      -c work_mem=32MB
+      -c maintenance_work_mem=256MB
+      -c effective_cache_size=3GB
     deploy:
       resources:
         limits:
@@ -11,6 +17,7 @@ services:
       options:
         max-size: "50m"
         max-file: "5"
+
 
   redis:
     deploy:
