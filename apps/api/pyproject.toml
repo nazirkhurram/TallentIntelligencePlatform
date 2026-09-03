@@ -16,6 +16,7 @@ dependencies = [
     "httpx>=0.27.0",
     "alembic>=1.13.0",
     "enum-schema",
+    "faker>=30.0.0",
 ]
 
 
